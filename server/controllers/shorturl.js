@@ -19,7 +19,7 @@ exports.getShort = function(req, res) {
 };
 
 var saveShort = function(req, res) {
-	var shorturl = Math.random().toString(36).substr(2, 15);
+	var shorturl = Math.random().toString(36).substr(2, 6);
 	Mapping.find({'shorturl': shorturl, 'urlstatus': 'ACTIVE'}, 'shorturl').exec(function(err, mappings) {
 		if (err) {
 			util.log(JSON.stringify(err));
