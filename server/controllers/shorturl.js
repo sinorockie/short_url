@@ -2,6 +2,7 @@ var util = require('util');
 
 var mongoose = require('mongoose'),
 	Mapping = mongoose.model('Mapping');
+	OpenURL = mongoose.model('OpenURL');
 	
 exports.getShort = function(req, res) {
 	Mapping.find({'longurl': req.body.longurl, 'urlstatus': 'ACTIVE'}, 'shorturl').exec(function(err, mappings) {
@@ -58,6 +59,16 @@ exports.getLong = function(req, res) {
 				if (!longurl.startsWith("http://") && !longurl.startsWith("https://")) {
 					longurl = "http://" + longurl;
 				}
+				var newOpen = new OpenURL({
+					shorturl: req.params.shorturl,
+					longurl: longurl,
+					ipaddress: req.headers['x-real-ip'] || req.headers['x-forwarded-for']
+				});
+				newOpen.save(function(err, results){
+					if (err) {
+						util.log(JSON.stringify(err));
+					}
+				});
 				res.redirect(longurl);
 			} else {
 				res.json({error: "too many mappings"});

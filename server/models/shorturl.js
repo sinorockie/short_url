@@ -8,3 +8,11 @@ var MappingSchema = new Schema({
 	createtime: {type: Date, default: Date.now}
 });
 mongoose.model('Mapping', MappingSchema);
+
+var OpenSchema = new Schema({
+	shorturl: {type: String, index: true, required: true},
+	longurl: {type: String, index: true, required: true},
+	ipaddress: {type: String, required: true},
+	createtime: {type: Date, default: Date.now}
+});
+mongoose.model('OpenURL', OpenSchema);
