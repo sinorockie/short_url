@@ -67,6 +67,7 @@ exports.getLong = function(req, res) {
 				newOpen.save(function(err, results){
 					if (err) {
 						util.log(JSON.stringify(err));
+						res.json({error: "err"});
 					}
 				});
 				res.redirect(longurl);
