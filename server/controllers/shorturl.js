@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 exports.getShort = function(req, res) {
 	Mapping.find({'longurl': req.body.longurl, 'urlstatus': 'ACTIVE'}, 'shorturl').exec(function(err, mappings) {
 		if (err) {
-			util.log(JSON.stringify(err));
+			util.log("find short url: " + JSON.stringify(err));
 			res.json({error: "err"});
 		} else {
 			if (mappings.length > 0) {
@@ -23,10 +23,11 @@ var saveShort = function(req, res) {
 	var shorturl = Math.random().toString(36).substr(2, 6);
 	Mapping.find({'shorturl': shorturl, 'urlstatus': 'ACTIVE'}, 'shorturl').exec(function(err, mappings) {
 		if (err) {
-			util.log(JSON.stringify(err));
+			util.log("verify short url: " + JSON.stringify(err));
 			res.json({error: "err"});
 		} else {
 			if (mappings.length > 0) {
+				util.log("existing short url: " + JSON.stringify(mappings));
 				saveShort(req, res);
 			} else {
 				var newMapping = new Mapping({
@@ -35,7 +36,7 @@ var saveShort = function(req, res) {
 				});
 				newMapping.save(function(err, results){
 					if (err) {
-						util.log(JSON.stringify(err));
+						util.log("save short url: " + JSON.stringify(err));
 						res.json({error: "err"});
 					} else {
 						res.json({shorturl: shorturl});
@@ -49,7 +50,7 @@ var saveShort = function(req, res) {
 exports.getLong = function(req, res) {
 	Mapping.find({'shorturl': req.params.shorturl, 'urlstatus': 'ACTIVE'}, 'longurl').exec(function(err, mappings) {
 		if (err) {
-			util.log(JSON.stringify(err));
+			util.log("find long url: " + JSON.stringify(err));
 			res.json({error: "err"});
 		} else {
 			if (mappings.length == 0) {
@@ -57,7 +58,9 @@ exports.getLong = function(req, res) {
 			} else if (mappings.length == 1) {
 				var longurl = mappings[0].longurl.toLowerCase();
 				if (!longurl.startsWith("http://") && !longurl.startsWith("https://")) {
-					longurl = "http://" + longurl;
+					longurl = "http://" + mappings[0].longurl;
+				} else {
+					longurl = mappings[0].longurl
 				}
 				var newOpen = new OpenURL({
 					shorturl: req.params.shorturl,
@@ -66,7 +69,7 @@ exports.getLong = function(req, res) {
 				});
 				newOpen.save(function(err, results){
 					if (err) {
-						util.log(JSON.stringify(err));
+						util.log("open url: " + JSON.stringify(err));
 						res.json({error: "err"});
 					}
 				});
